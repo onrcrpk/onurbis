@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ONURBIS - Shapes the Globe</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="L.switchBasemap.css" />
+
+    <style>
+
+
+
+    </style>
+
+    <!-- Add this in your HTML <head> section -->
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script src="L.switchBasemap.js"></script> 
+</head>
+<body>
+
+
+    <div id="map"></div>
+    <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Katman Yükleniyor...</div>
+    </div>
+
+
+
+
+
+ 
+
+    <script>
+
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    
+        // Initialize the map
+        var map = L.map('map').setView([39.5, 35], 6);
+
+        // Define base layers
+        var baseLayer1 = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+
+        var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri'
+        });
+
+        var Esri_WorldTopoMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Esri'
+        });
+
+        // Add the first base layer to the map
+        Esri_WorldTopoMap.addTo(map);
+
+        // Create the basemap switcher control
+        var basemapSwitcher = L.basemapsSwitcher([
+
+        {
+                name: 'Esri World Topo Map',
+                icon: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/0/0/0.png', // Use a suitable icon URL
+                layer: Esri_WorldTopoMap
+            },
+            {
+                name: 'Esri World Imagery',
+                icon: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/0/0/0.png', // Use a suitable icon URL
+                layer: Esri_WorldImagery
+            },
+            {
+                name: 'OpenStreetMap',
+                icon: 'https://a.tile.openstreetmap.org/0/0/0.png', // Use a suitable icon URL
+                layer: baseLayer1
+            }
+
+        ], {
+            position: 'bottomleft' // Position control at bottom left
+        });
+
+        // Add the basemap switcher control to the map
+        map.addControl(basemapSwitcher);
+
+        // Add the basemap switcher control to the map
+        map.addControl(basemapSwitcher);
+
+
+
+        var Esri_WorldTopoMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+});
+
+
+
+
+
+
+
+    var strmLayer = L.tileLayer.wms('https://tucbs-public-api.csb.gov.tr/trk_srtm_wms', {
+        layers: '0',
+        format: 'image/png',
+        transparent: true,
+        attribution: 'SRTM WMS'
+    });
+
+    var karayolu = L.tileLayer.wms('https://tucbs-public-api.csb.gov.tr/trk_uab_kgm_karayolu_wms', {
+        layers: 'karayolu',
+        format: 'image/png',
+        transparent: true,
+        attribution: 'Karayolu'
+    });
+
+    var göller = L.tileLayer.wms('https://tucbs-public-api.csb.gov.tr/trk_sygm_yerustu_su_kutlesi_gol_wms', {
+        layers: 'yerustu_su_kutlesi_gol',
+        format: 'image/png',
+        transparent: true,
+        attribution: 'Su kütlesi (göl) WMS'
+    });
+
+    var desertificationLayer = L.tileLayer.wms('https://tucbs-public-api.csb.gov.tr/trk_cemgm_collesmehassasiyetharitasi_wms', {
+        layers: '0',
+        format: 'image/png',
+        transparent: true,
+        attribution: 'Collesme Hassasiyeti WMS'
+    });
+
+
+
+
+
+    var overlayMaps = {
+        "A Bakanlığı": {
+            "STRM": strmLayer,
+            "Karayolu": karayolu
+        },
+        "B Bakanlığı": {
+            "Çölleşme Servisi": desertificationLayer
+        },
+        "C Bakanlığı": {
+            "Sulak alanlar": göller
+        }
+    };
+
+    var activeLayers = new Set();
+    var loadingLayers = new Set();
+
+    function getLegendUrl(layer) {
+        var baseUrl = layer._url;
+        var legendUrl = `${baseUrl}?service=WMS&version=1.1.1&request=GetLegendGraphic&layer=${layer.wmsParams.layers}&format=image/png`;
+        return legendUrl;
+    }
+
+    function createLegendControl(layer) {
+        var legendDiv = L.DomUtil.create('div', 'legend-control');
+        var img = document.createElement('img');
+        img.src = getLegendUrl(layer);
+        img.alt = 'Legend';
+        img.style.width = 'auto'; // Adjust as needed
+        img.style.height = 'auto'; // Maintain aspect ratio
+        legendDiv.appendChild(img);
+        return legendDiv;
+    }
+
+    function createOpacityControl(layer) {
+        var controlDiv = L.DomUtil.create('div', 'opacity-control');
+        var label = document.createElement('label');
+        label.textContent = 'Saydamlık:';
+        var slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = '0';
+        slider.max = '1';
+        slider.step = '0.01';
+        slider.value = layer.options.opacity || '1';
+        slider.className = 'opacity-slider';
+
+        slider.addEventListener('input', function() {
+            layer.setOpacity(parseFloat(this.value));
+        });
+
+        slider.addEventListener('mousedown', function() {
+            map.dragging.disable();
+        });
+        slider.addEventListener('mouseup', function() {
+            map.dragging.enable();
+        });
+
+        controlDiv.appendChild(label);
+        controlDiv.appendChild(slider);
+
+        return controlDiv;
+    }
+
+    function showLoadingSpinner() {
+        var container = document.querySelector('.loading-container');
+        if (container) {
+            container.style.display = 'block';
+        }
+    }
+
+    function hideLoadingSpinner() {
+        var container = document.querySelector('.loading-container');
+        if (container) {
+            container.style.display = 'none';
+        }
+    }
+
+    function handleLayerLoading(layer, isLoading) {
+        if (isLoading) {
+            loadingLayers.add(layer);
+            showLoadingSpinner();
+        } else {
+            loadingLayers.delete(layer);
+            if (loadingLayers.size === 0) {
+                hideLoadingSpinner();
+            }
+        }
+    }
+
+    function addLayerWithLoadingIndicator(layer) {
+        layer.on('loading', function() {
+            handleLayerLoading(layer, true);
+        });
+        layer.on('load', function() {
+            handleLayerLoading(layer, false);
+        });
+        layer.on('error', function() {
+            handleLayerLoading(layer, false);
+        });
+    }
+
+    function updateLayerControl(layer, add) {
+        if (add) {
+            activeLayers.add(layer);
+        } else {
+            activeLayers.delete(layer);
+            handleLayerLoading(layer, false);  // Ensure spinner is hidden if layer is removed
+        }
+    }
+
+    for (var groupName in overlayMaps) {
+        var group = overlayMaps[groupName];
+        for (var layerName in group) {
+            var layer = group[layerName];
+            addLayerWithLoadingIndicator(layer);
+        }
+    }
+
+    var customControl = L.control({ position: 'topright' });
+
+    customControl.onAdd = function(map) {
+        var div = L.DomUtil.create('div', 'leaflet-control-custom');
+        div.innerHTML = '<h3>Katmanlar</h3>';
+
+        for (var groupName in overlayMaps) {
+            var group = overlayMaps[groupName];
+            var groupContainer = document.createElement('div');
+            groupContainer.className = 'layer-group';
+
+            var header = document.createElement('div');
+            header.className = 'layer-group-header';
+            header.innerHTML = `<span>${groupName}</span><span class="toggle-button">+</span>`;
+            groupContainer.appendChild(header);
+
+            var content = document.createElement('div');
+            content.className = 'layer-group-content';
+
+            for (var layerName in group) {
+                var layer = group[layerName];
+                var label = document.createElement('label');
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.dataset.layerName = layerName;
+                checkbox.dataset.groupName = groupName;
+
+                checkbox.addEventListener('change', function(e) {
+                    var targetLayerName = this.dataset.layerName;
+                    var targetGroupName = this.dataset.groupName;
+                    var targetLayer = overlayMaps[targetGroupName][targetLayerName];
+                    var legendControl = createLegendControl(targetLayer);
+
+                    if (e.target.checked) {
+                        map.addLayer(targetLayer);
+                        updateLayerControl(targetLayer, true);
+                        var opacityControl = createOpacityControl(targetLayer);
+                        this.parentElement.appendChild(legendControl); // Add the legend image
+                        this.parentElement.appendChild(opacityControl);
+                    } else {
+                        map.removeLayer(targetLayer);
+                        updateLayerControl(targetLayer, false);
+                        var opacityControl = this.parentElement.querySelector('.opacity-control');
+                        var legendControl = this.parentElement.querySelector('.legend-control');
+                        if (opacityControl) {
+                            this.parentElement.removeChild(opacityControl);
+                        }
+                        if (legendControl) {
+                            this.parentElement.removeChild(legendControl);
+                        }
+                    }
+                });
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(layerName));
+                content.appendChild(label);
+            }
+
+            groupContainer.appendChild(content);
+            div.appendChild(groupContainer);
+
+            header.onclick = function() {
+                var button = this.querySelector('.toggle-button');
+                var contentDiv = this.nextSibling;
+                var isExpanded = contentDiv.style.display === 'block';
+                contentDiv.style.display = isExpanded ? 'none' : 'block';
+                button.innerHTML = isExpanded ? '+' : '-';
+            };
+        }
+
+        L.DomEvent.disableClickPropagation(div);
+        return div;
+    };
+
+    customControl.addTo(map);
+
+   function getFeatureInfo(evt) {
+                var point = map.latLngToContainerPoint(evt.latlng, map.getZoom());
+                var size = map.getSize();
+        
+                var requests = Array.from(activeLayers).map(layer => {
+                    var params = {
+                        request: 'GetFeatureInfo',
+                        service: 'WMS',
+                        srs: 'EPSG:4326',
+                        styles: layer.wmsParams.styles || '',
+                        transparent: layer.wmsParams.transparent || true,
+                        version: '1.1.1',
+                        format: layer.wmsParams.format || 'image/png',
+                        bbox: map.getBounds().toBBoxString(),
+                        height: size.y,
+                        width: size.x,
+                        layers: layer.wmsParams.layers || '',
+                        query_layers: layer.wmsParams.layers || '',
+                        info_format: 'application/json',
+                        x: point.x,
+                        y: point.y
+                    };
+        
+                    var url = layer._url + L.Util.getParamString(params, layer._url, true);
+        
+                    return fetch(url)
+                        .then(response => response.text())
+                        .then(data => {
+                            console.log('Raw Response Data:', data);
+                            return { layer, data };
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            return { layer, data: null };
+                        });
+                });
+        
+                Promise.all(requests).then(results => {
+                    var content = '<h4>Feature Info</h4>';
+                    var featuresFound = false;
+        
+                    results.forEach(result => {
+                        if (result.data) {
+                            try {
+                                var jsonData = JSON.parse(result.data);
+                                if (jsonData.features && jsonData.features.length > 0) {
+                                    featuresFound = true;
+                                    content += '<table><thead><tr><th>Property</th><th>Value</th></tr></thead><tbody>';
+                                    jsonData.features.forEach(feature => {
+                                        for (var prop in feature.properties) {
+                                            content += `<tr><td><b>${prop}:</b></td><td>${feature.properties[prop]}</td></tr>`;
+                                        }
+                                    });
+                                    content += '</tbody></table>';
+                                }
+                            } catch (e) {
+                                console.warn('Failed to parse JSON, trying XML.');
+                            }
+        
+                            if (!featuresFound) {
+                                var parser = new DOMParser();
+                                var xmlDoc = parser.parseFromString(result.data, "text/xml");
+        
+                                var fields = xmlDoc.getElementsByTagName("FIELDS");
+                                
+                                if (fields.length > 0) {
+                                    featuresFound = true;
+                                    content += '<table><thead><tr><th>Attribute</th><th>Value</th></tr></thead><tbody>';
+                                    var attributes = fields[0].attributes;
+                                    for (var i = 0; i < attributes.length; i++) {
+                                        var attr = attributes[i];
+                                        content += `<tr><td><b>${attr.name}:</b></td><td>${attr.value}</td></tr>`;
+                                    }
+                                    content += '</tbody></table>';
+                                }
+                            }
+                        }
+                    });
+        
+                    if (featuresFound) {
+                        L.popup()
+                            .setLatLng(evt.latlng)
+                            .setContent(content)
+                            .openOn(map);
+                    } else {
+                        return
+                    }
+                });
+            }
+
+
+
+
+    map.on('click', getFeatureInfo);
+
+    // Add scale control
+    L.control.scale({ position: 'bottomright' }).addTo(map);
+
+ 
+    
+
+
+
+       // Create a control for the WMS button
+       var addWmsLayerControl = L.control({ position: 'topright' });
+
+
+addWmsLayerControl.onAdd = function(map) {
+    var div = L.DomUtil.create('div', 'leaflet-control-add-wms');
+    div.innerHTML = '<button id="leaflet-control-add-wms" class="btn btn-primary">Kendi WMS URLni ekle</button>';
+    return div;
+};
+
+
+addWmsLayerControl.addTo(map);
+
+document.getElementById('leaflet-control-add-wms').addEventListener('click', function() {
+    var url = prompt('WMS Servis Linkinizi Ekleyiniz:');
+    if (!url) return;
+
+    fetch(url + '?service=WMS&request=GetCapabilities')
+        .then(response => response.text())
+        .then(data => {
+            var parser = new DOMParser();
+            var xmlDoc = parser.parseFromString(data, 'text/xml');
+            var layers = xmlDoc.getElementsByTagName('Layer');
+
+            // Create a dropdown for layer options
+            var select = document.createElement('select');
+            var option = document.createElement('option');
+            option.text = 'Servise ait bir katman seçiniz.';
+            option.value = '';
+            select.appendChild(option);
+
+            Array.from(layers).forEach(layer => {
+                var name = layer.getElementsByTagName('Name')[0]?.textContent;
+                if (name) {
+                    var option = document.createElement('option');
+                    option.text = name;
+                    option.value = name;
+                    select.appendChild(option);
+                }
+            });
+
+            // Create a form for layer name input
+            var form = document.createElement('form');
+            form.innerHTML = `
+                <label for="layer-name">Katman Adı Giriniz:</label>
+                <input type="text" id="layer-name" required>
+            `;
+            form.appendChild(select);
+            form.appendChild(document.createElement('br'));
+            var submitButton = document.createElement('button');
+            submitButton.textContent = 'Katman Ekle';
+            form.appendChild(submitButton);
+
+            // Show the form in a popup
+            L.popup()
+                .setLatLng(map.getCenter())
+                .setContent(form)
+                .openOn(map);
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var selectedLayer = select.value;
+                var layerName = document.getElementById('layer-name').value;
+
+                if (selectedLayer && layerName) {
+                    var userWmsLayer = L.tileLayer.wms(url, {
+                        layers: selectedLayer,
+                        format: 'image/png',
+                        transparent: true,
+                        attribution: layerName
+                    });
+
+                    // Add the layer to the map and update the layer control
+                    map.addLayer(userWmsLayer);
+                    overlayMaps["Eklediğiniz Katmanlar"] = overlayMaps["Eklediğiniz Katmanlar"] || {};
+                    overlayMaps["Eklediğiniz Katmanlar"][layerName] = userWmsLayer;
+                    updateLayerControl(userWmsLayer, true);
+
+                    // Re-render the custom control to include the new layer
+                    updateCustomControl();
+
+                    // Ensure all layers have their legend and opacity controls displayed
+                    updateLegendAndOpacityControls();
+
+                    // Ensure "Eklediğiniz Katmanlar" section is open
+                    openUserLayersSection();
+
+                    map.closePopup();
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching WMS capabilities:', error);
+        });
+});
+
+function updateCustomControl() {
+    var customControlDiv = document.querySelector('.leaflet-control-custom');
+    if (customControlDiv) {
+        customControlDiv.innerHTML = '<h3>Katmanlar</h3>';
+        for (var groupName in overlayMaps) {
+            var group = overlayMaps[groupName];
+            var groupContainer = document.createElement('div');
+            groupContainer.className = 'layer-group';
+
+            var header = document.createElement('div');
+            header.className = 'layer-group-header';
+            header.innerHTML = `<span>${groupName}</span><span class="toggle-button">+</span>`;
+            groupContainer.appendChild(header);
+
+            var content = document.createElement('div');
+            content.className = 'layer-group-content';
+
+            for (var layerName in group) {
+                var layer = group[layerName];
+                var label = document.createElement('label');
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.dataset.layerName = layerName;
+                checkbox.dataset.groupName = groupName;
+                checkbox.checked = map.hasLayer(layer);
+
+                checkbox.addEventListener('change', function(e) {
+                    var targetLayerName = this.dataset.layerName;
+                    var targetGroupName = this.dataset.groupName;
+                    var targetLayer = overlayMaps[targetGroupName][targetLayerName];
+                    var legendControl = createLegendControl(targetLayer);
+
+                    if (e.target.checked) {
+                        map.addLayer(targetLayer);
+                        updateLayerControl(targetLayer, true);
+                        // Ensure legend and opacity controls are visible
+                        var existingLegend = this.parentElement.querySelector('.legend-control');
+                        var existingOpacity = this.parentElement.querySelector('.opacity-control');
+                        if (!existingLegend) {
+                            var legendControl = createLegendControl(targetLayer);
+                            this.parentElement.appendChild(legendControl);
+                        }
+                        if (!existingOpacity) {
+                            var opacityControl = createOpacityControl(targetLayer);
+                            this.parentElement.appendChild(opacityControl);
+                        }
+                    } else {
+                        map.removeLayer(targetLayer);
+                        updateLayerControl(targetLayer, false);
+                        var opacityControl = this.parentElement.querySelector('.opacity-control');
+                        var legendControl = this.parentElement.querySelector('.legend-control');
+                        if (opacityControl) {
+                            this.parentElement.removeChild(opacityControl);
+                        }
+                        if (legendControl) {
+                            this.parentElement.removeChild(legendControl);
+                        }
+                    }
+                });
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(layerName));
+                content.appendChild(label);
+            }
+
+            groupContainer.appendChild(content);
+            customControlDiv.appendChild(groupContainer);
+
+            header.onclick = function() {
+                var button = this.querySelector('.toggle-button');
+                var contentDiv = this.nextSibling;
+                var isExpanded = contentDiv.style.display === 'block';
+                contentDiv.style.display = isExpanded ? 'none' : 'block';
+                button.innerHTML = isExpanded ? '+' : '-';
+            };
+        }
+    }
+}
+
+function updateLegendAndOpacityControls() {
+    var customControlDiv = document.querySelector('.leaflet-control-custom');
+    if (customControlDiv) {
+        var checkboxes = customControlDiv.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                var layerName = checkbox.dataset.layerName;
+                var layer = overlayMaps["Eklediğiniz Katmanlar"][layerName];
+                if (layer) {
+                    var legendControl = createLegendControl(layer);
+                    var opacityControl = createOpacityControl(layer);
+
+                    var label = checkbox.parentElement;
+                    // Remove existing controls to prevent duplicates
+                    var existingLegend = label.querySelector('.legend-control');
+                    var existingOpacity = label.querySelector('.opacity-control');
+                    if (existingLegend) label.removeChild(existingLegend);
+                    if (existingOpacity) label.removeChild(existingOpacity);
+
+                    // Append controls
+                    label.appendChild(legendControl);
+                    label.appendChild(opacityControl);
+                }
+            }
+        });
+    }
+}
+
+function openUserLayersSection() {
+    var customControlDiv = document.querySelector('.leaflet-control-custom');
+    if (customControlDiv) {
+        var userLayerHeader = customControlDiv.querySelector('.layer-group-header span');
+        if (userLayerHeader && userLayerHeader.textContent === 'Eklediğiniz Katmanlar') {
+            var userLayerContent = userLayerHeader.parentElement.nextSibling;
+            if (userLayerContent) {
+                userLayerContent.style.display = 'block';
+                userLayerHeader.nextSibling.innerHTML = '-';
+            }
+        }
+    }
+}
+
+// Initialize custom control on page load
+updateCustomControl();
+updateLegendAndOpacityControls();
+});
+
+
+
+</script>
+        
+        
+        
+        
+        
+        
+
+
+</body>
+</html>

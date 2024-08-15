@@ -1,0 +1,234 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#map {
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+}
+
+.leaflet-control-custom {
+    position: absolute;
+    top: 40px;
+    right: 10px;
+    z-index: 1000;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 11px;
+    cursor: default;
+    max-height: 500px;
+    overflow-y: auto;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    width: 250px;
+    box-sizing: border-box;
+}
+
+
+.leaflet-control-custom h3 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: #333;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 4px;
+}
+
+
+/* Base button styles */
+.leaflet-control-add-wms .btn {
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    padding: 5px 10px;
+    color: #333333;  /* Koyu gri metin rengi */
+    background-color: #f5f5f5;  /* Beyaza yakın açık gri arka plan rengi */
+    border: 1px solid #e0e0e0;  /* Hafif gri kenar rengi */
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    left: -10px;
+}
+
+/* Hover effects */
+.leaflet-control-add-wms .btn:hover {
+    background-color: #e69a0f;  /* Hafif koyulaşmış açık gri */
+    border-color: #d0d0d0;  /* Kenar rengini koyulaştırma */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Active button state */
+.leaflet-control-add-wms .btn:active {
+    background-color: #e69a0f;  /* Daha koyu açık gri */
+    border-color: #b0b0b0;  /* Kenar rengini daha da koyulaştırma */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(0);
+}
+
+/* Button focus state */
+.leaflet-control-add-wms .btn:focus {
+    outline: none;
+    box-shadow: 0px 0px 0px 3px rgba(240, 240, 240, 0.5);  /* Beyazımsı odak halkası */
+}
+
+
+
+
+.layer-group {
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.layer-group-header {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 6px;
+    background: #f0f0f0;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s;
+}
+
+.layer-group-header:hover {
+    background-color: #e0e0e0;
+}
+
+.layer-group-content {
+    display: none;
+    padding: 8px;
+    background: #fff;
+}
+
+.layer-group-content label {
+    display: block;
+    margin: 3px 0;
+    font-size: 11px;
+}
+
+.toggle-button {
+    cursor: pointer;
+    font-size: 16px;
+    transition: transform 0.3s;
+}
+
+.toggle-button.open {
+    transform: rotate(45deg);
+}
+
+.opacity-control {
+    margin-top: 5px;
+    font-size: 11px;
+}
+
+.opacity-control label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.opacity-slider {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #ddd;
+    height: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+}
+
+.opacity-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    background: #fd7e14;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.opacity-slider::-moz-range-thumb {
+    background: #fd7e14;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.loading-container {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: none; /* Initially hidden */
+    z-index: 1000; /* Ensure it's above other elements */
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid orange;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    margin-top: 10px;
+    font-size: 16px;
+    color: orange;
+    font-weight: bold;
+    background-color: white; /* Add white background */
+    padding: 2px; /* Add padding for better appearance */
+    border-radius: 8px; /* Round the corners */
+}
+
+.leaflet-popup-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    font-size: 10px;
+    max-width: 250px;
+    margin: 1px;
+    padding: 1px;
+}
+
+.leaflet-popup-content table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.leaflet-popup-content table th, 
+.leaflet-popup-content table td {
+    padding: 5px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.leaflet-popup-content table th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+
+.leaflet-popup-content h4 {
+    margin: 0 0 10px 0;
+    font-size: 11px;
+    color: #333;
+}
