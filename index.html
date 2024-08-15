@@ -128,20 +128,34 @@ document.addEventListener('DOMContentLoaded', function() {
         attribution: 'Collesme Hassasiyeti WMS'
     });
 
+    var biyoatik = L.tileLayer.wms('https://tucbs-public-api.csb.gov.tr/trk_eigm_bepa_2017_bitkisel_atik_miktari_wms', {
+        layers: '1348_BEPA_2017_BITKISEL_ATIK_MIKTARI_TON_YIL',
+        format: 'image/png',
+        transparent: true,
+        attribution: 'Biyokütle Enerjisi Potansiyel Atlası - 2017 Bitkisel Atık Miktarı (Ton/Yıl)'
+    });
 
+    var lpgstation = L.tileLayer.wms('https://tucbs-public-api.csb.gov.tr/trk_epdk_AkaryakitIstasyonlari_wms', {
+        layers: 'AkaryakitIstasyonlari',
+        format: 'image/png',
+        transparent: true,
+        attribution: 'Akaryakıt İstasyonları'
+    });
 
 
 
     var overlayMaps = {
-        "A Bakanlığı": {
+        "T.C. Çevre Şehircilik ve İklim Değişikliği Bakanlığı": {
             "STRM": strmLayer,
-            "Karayolu": karayolu
+            "Karayolu": karayolu,
+            "Çölleşme Hassasiyet Haritası": desertificationLayer
         },
-        "B Bakanlığı": {
-            "Çölleşme Servisi": desertificationLayer
+        "T.C. Enerji ve Tabii Kaynaklar Bakanlığı ": {
+            "Bitkisel Atık Miktarı": biyoatik,
+            "Akaryakıt İstasyonları": lpgstation
         },
-        "C Bakanlığı": {
-            "Sulak alanlar": göller
+        "T.C. Tarım ve Orman Bakanlığı": {
+            "Sulak Alanlar": göller
         }
     };
 
