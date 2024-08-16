@@ -1,3 +1,4 @@
+
 html, body {
     height: 100%;
     margin: 0;
@@ -231,4 +232,27 @@ html, body {
     margin: 0 0 10px 0;
     font-size: 11px;
     color: #333;
+}
+
+
+.layer-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Add space between label and button */
+    margin-bottom: 5px;
+}
+
+
+
+
+
+.zoom-button {
+    margin-left: auto; /* Pushes the button to the far right */
+    padding: 2px 8px;
+    font-size: 10px;
+    cursor: pointer;
+    background-color: #f0f0f0; /* Optional: adjust the background color */
+    border: 1px solid #ddd; /* Optional: add a border */
+    border-radius: 4px; /* Optional: rounded corners */
+    margin-bottom: 10px;
 }
